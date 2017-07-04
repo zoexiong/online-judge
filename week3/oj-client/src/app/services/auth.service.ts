@@ -18,6 +18,11 @@ export class AuthService {
   constructor(public router: Router) {}
 
   public login(): void {
+    //get current path
+    var parser = document.createElement('a');
+    parser.href = window.location.href;
+    var path = parser.pathname;
+    localStorage.setItem('redirectUri', path);
     this.auth0.authorize();
   }
 
@@ -26,10 +31,13 @@ export class AuthService {
       if (authResult && authResult.accessToken && authResult.idToken) {
         window.location.hash = '';
         this.setSession(authResult);
-        this.router.navigate(['/home']);
+        //access local storage to get the path and redirect to original page
+        this.router.navigate([localStorage['redirectUri']]);
       } else if (err) {
         this.router.navigate(['/home']);
         console.log(err);
+      } else if (localStorage['redirectUri']){
+        this.router.navigate([localStorage['redirectUri']]);
       }
     });
   }
@@ -43,12 +51,21 @@ export class AuthService {
   }
 
   public logout(): void {
+
+    //get current path
+    var parser = document.createElement('a');
+    parser.href = window.location.href;
+    var path = parser.pathname;
+    localStorage.setItem('redirectUri', path);
+
     // Remove tokens and expiry time from localStorage
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
-    // Go back to the home route
-    this.router.navigate(['/']);
+
+    // // Go back to the home route
+    // console.log('logout path: ' + path);
+    // this.router.navigate([localStorage['redirectUri']]);
   }
 
   public isAuthenticated(): boolean {

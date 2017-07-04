@@ -22,10 +22,15 @@
         <ul class="nav navbar-nav navbar-right">
           <li>
             <form class="navbar-form">
-              <button type="button" class="btn btn-primary">Sign in</button>
+              <button
+                class="btn btn-primary btn-margin"
+                *ngIf="!auth.isAuthenticated()"
+                (click)="auth.login()">
+                Log In
+              </button>
             </form>
           </li>
-          <li class="dropdown">
+          <li class="dropdown" *ngIf="auth.isAuthenticated()">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}} <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="#">My Profile</a></li>
@@ -33,20 +38,13 @@
               <li><a href="#">My Submissions</a></li>
               <li role="separator" class="divider"></li>
               <li>
-                <button
-                  class="btn btn-primary btn-margin"
-                  *ngIf="!auth.isAuthenticated()"
-                  (click)="auth.login()">
-                  Log In
-              </button>
-              </li>
-              <li>
-                <button
-                  class="btn btn-primary btn-margin"
-                  *ngIf="auth.isAuthenticated()"
-                  (click)="auth.logout()">
-                  Log Out
-                </button>
+                <a href="#">
+                  <button
+                    class="btn btn-primary btn-margin"
+                    (click)="auth.logout()">
+                    Log Out
+                  </button>
+                </a>
               </li>
             </ul>
           </li>
