@@ -32,7 +32,22 @@
               <li><a href="#">My Favorites</a></li>
               <li><a href="#">My Submissions</a></li>
               <li role="separator" class="divider"></li>
-              <li><a href="#">Sign out</a></li>
+              <li>
+                <button
+                  class="btn btn-primary btn-margin"
+                  *ngIf="!auth.isAuthenticated()"
+                  (click)="auth.login()">
+                  Log In
+              </button>
+              </li>
+              <li>
+                <button
+                  class="btn btn-primary btn-margin"
+                  *ngIf="auth.isAuthenticated()"
+                  (click)="auth.logout()">
+                  Log Out
+                </button>
+              </li>
             </ul>
           </li>
         </ul>

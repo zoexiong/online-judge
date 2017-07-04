@@ -20,7 +20,6 @@
     "@angular/platform-browser": "^2.4.0",
     "@angular/platform-browser-dynamic": "^2.4.0",
     "@angular/router": "^3.4.0",
-    "angular-auth0": "^2.0.0-beta.2",
     "auth0-js": "^8.8.0",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
@@ -45,6 +44,6 @@
     "protractor": "~5.1.0",
     "ts-node": "~2.0.0",
     "tslint": "~4.5.0",
-    "typescript": "~2.0.0"
+    "typescript": "~2.1.5"
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
-import * as auth0 from 'auth0-js';
+import * as auth0 from 'auth0-js/build/auth0.js';
 
 @Injectable()
 export class AuthService {
@@ -57,6 +57,4 @@ export class AuthService {
     const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
   }
-
-
 }
