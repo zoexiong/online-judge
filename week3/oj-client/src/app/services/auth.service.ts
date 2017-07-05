@@ -12,10 +12,10 @@ export class AuthService {
     responseType: 'token id_token',
     audience: 'https://justkzoe.auth0.com/userinfo',
     redirectUri: 'http://localhost:3000',
-    scope: 'openid'
+    scope: 'openid profile'
   });
 
-  constructor(public router: Router) {}
+    constructor(public router: Router) {}
 
   public login(): void {
     //get current path
@@ -27,19 +27,24 @@ export class AuthService {
   }
 
   public handleAuthentication(): void {
-    this.auth0.parseHash((err, authResult) => {
-      if (authResult && authResult.accessToken && authResult.idToken) {
-        window.location.hash = '';
-        this.setSession(authResult);
-        //access local storage to get the path and redirect to original page
-        this.router.navigate([localStorage['redirectUri']]);
-      } else if (err) {
-        this.router.navigate(['/home']);
-        console.log(err);
-      } else if (localStorage['redirectUri']){
-        this.router.navigate([localStorage['redirectUri']]);
-      }
-    });
+      this.auth0.parseHash((err, authResult) => {
+        if (authResult && authResult.accessToken && authResult.idToken) {
+          window.location.hash = '';
+          this.setSession(authResult);
+          //access local storage to get the path and redirect to original page
+          if (localStorage['redirectUri']){
+            this.router.navigate([localStorage['redirectUri']]);
+            localStorage.setItem('redirectUri', '');
+            window.location.reload(false);
+          }
+        } else if (err) {
+          this.router.navigate(['/home']);
+          console.log(err);
+        } else if (localStorage['redirectUri'] != ''){
+          this.router.navigate([localStorage['redirectUri']]);
+          localStorage.setItem('redirectUri', '');
+        }
+      });
   }
 
   private setSession(authResult): void {
@@ -62,10 +67,6 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
-
-    // // Go back to the home route
-    // console.log('logout path: ' + path);
-    // this.router.navigate([localStorage['redirectUri']]);
   }
 
   public isAuthenticated(): boolean {
@@ -73,5 +74,23 @@ export class AuthService {
     // access token's expiry time
     const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
+  }
+
+  //get user profile
+  userProfile: any;
+
+  public getProfile(cb): void {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      throw new Error('Access token must exist to fetch profile');
+    }
+
+    const self = this;
+    this.auth0.client.userInfo(accessToken, (err, profile) => {
+      if (profile) {
+        self.userProfile = profile;
+      }
+      cb(err, profile);
+    });
   }
 }
