@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
 import * as auth0 from 'auth0-js/build/auth0.js';
+import { Http, Response, Headers } from "@angular/http";
 
 @Injectable()
 export class AuthService {
@@ -12,10 +13,14 @@ export class AuthService {
     responseType: 'token id_token',
     audience: 'https://justkzoe.auth0.com/userinfo',
     redirectUri: 'http://localhost:3000',
-    scope: 'openid profile'
+    scope: 'openid profile email'
   });
 
-    constructor(public router: Router) {}
+  domain = 'justkzoe.auth0.com';
+  clientId = '77qZhSotzYJwgx1U3NYeEE9YGGD71Qd6';
+
+  constructor(public router: Router, private http: Http) {
+  }
 
   public login(): void {
     //get current path
@@ -27,24 +32,24 @@ export class AuthService {
   }
 
   public handleAuthentication(): void {
-      this.auth0.parseHash((err, authResult) => {
-        if (authResult && authResult.accessToken && authResult.idToken) {
-          window.location.hash = '';
-          this.setSession(authResult);
-          //access local storage to get the path and redirect to original page
-          if (localStorage['redirectUri']){
-            this.router.navigate([localStorage['redirectUri']]);
-            localStorage.setItem('redirectUri', '');
-            window.location.reload(false);
-          }
-        } else if (err) {
-          this.router.navigate(['/']);
-          console.log(err);
-        } else if (localStorage['redirectUri']){
+    this.auth0.parseHash((err, authResult) => {
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        window.location.hash = '';
+        this.setSession(authResult);
+        //access local storage to get the path and redirect to original page
+        if (localStorage['redirectUri']) {
           this.router.navigate([localStorage['redirectUri']]);
           localStorage.setItem('redirectUri', '');
+          window.location.reload(false);
         }
-      });
+      } else if (err) {
+        this.router.navigate(['/']);
+        console.log(err);
+      } else if (localStorage['redirectUri']) {
+        this.router.navigate([localStorage['redirectUri']]);
+        localStorage.setItem('redirectUri', '');
+      }
+    });
   }
 
   private setSession(authResult): void {
@@ -97,32 +102,37 @@ export class AuthService {
 
   public getProfile(cb): void {
     var profile = {};
-    if (localStorage['profile']){
-      profile =  JSON.parse(localStorage['profile']);
+    if (localStorage['profile']) {
+      profile = JSON.parse(localStorage['profile']);
       cb(profile);
-    } else if (localStorage['access_token']){
+    } else if (localStorage['access_token']) {
       this.getUserinfo((err, profile) => {
         cb(profile);
       })
     }
   }
 
-  public resetPassword(): void{
-    // var request = require("request");
-    //
-    // var options = { method: 'POST',
-    //   url: 'https://justkzoe.auth0.com/dbconnections/change_password',
-    //   headers: { 'content-type': 'application/json' },
-    //   body:
-    //   { client_id: '77qZhSotzYJwgx1U3NYeEE9YGGD71Qd6',
-    //     email: '',
-    //     connection: 'Username-Password-Authentication' },
-    //   json: true };
-    //
-    // request(options, function (error, response, body) {
-    //   if (error) throw new Error(error);
-    //
-    //   console.log(body);
-    // });
+  public resetPassword(): void {
+    let profile = JSON.parse(localStorage['profile']);
+    let url: string = `https://${this.domain}/dbconnections/change_password`;
+    let headers = new Headers({'content-type': 'application/json'});
+    let body = {
+      client_id: this.clientId,
+      email: profile.email,
+      connection: 'Username-Password-Authentication'
+    };
+
+    this.http.post(url, body, headers)
+      .toPromise()
+      .then((res: Response) => {
+        console.log(res);
+      })
+      .catch(this.handleError);
   }
+
+  private handleError(error: any): Promise<any> {
+    console.log('Error: ', error);
+    return Promise.reject(error.message || error);
+  }
+
 }
