@@ -38,9 +38,9 @@ export class AuthService {
             window.location.reload(false);
           }
         } else if (err) {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/']);
           console.log(err);
-        } else if (localStorage['redirectUri'] != ''){
+        } else if (localStorage['redirectUri']){
           this.router.navigate([localStorage['redirectUri']]);
           localStorage.setItem('redirectUri', '');
         }
