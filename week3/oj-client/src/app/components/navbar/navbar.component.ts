@@ -20,12 +20,8 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.auth.userProfile) {
-      this.profile = this.auth.userProfile;
-    } else if (localStorage['access_token']){
-      this.auth.getProfile((err, profile) => {
-        this.profile = profile;
-      });
-    }
+    this.auth.getProfile((profile) => {
+      this.profile = profile;
+    });
   }
 }

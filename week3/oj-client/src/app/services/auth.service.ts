@@ -67,6 +67,7 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
+    localStorage.removeItem('profile');
   }
 
   public isAuthenticated(): boolean {
@@ -79,18 +80,49 @@ export class AuthService {
   //get user profile
   userProfile: any;
 
-  public getProfile(cb): void {
+  public getUserinfo(cb): void {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
       throw new Error('Access token must exist to fetch profile');
     }
-
     const self = this;
     this.auth0.client.userInfo(accessToken, (err, profile) => {
       if (profile) {
         self.userProfile = profile;
+        localStorage.setItem('profile', JSON.stringify(profile))
       }
       cb(err, profile);
     });
+  }
+
+  public getProfile(cb): void {
+    var profile = {};
+    if (localStorage['profile']){
+      profile =  JSON.parse(localStorage['profile']);
+      cb(profile);
+    } else if (localStorage['access_token']){
+      this.getUserinfo((err, profile) => {
+        cb(profile);
+      })
+    }
+  }
+
+  public resetPassword(): void{
+    // var request = require("request");
+    //
+    // var options = { method: 'POST',
+    //   url: 'https://justkzoe.auth0.com/dbconnections/change_password',
+    //   headers: { 'content-type': 'application/json' },
+    //   body:
+    //   { client_id: '77qZhSotzYJwgx1U3NYeEE9YGGD71Qd6',
+    //     email: '',
+    //     connection: 'Username-Password-Authentication' },
+    //   json: true };
+    //
+    // request(options, function (error, response, body) {
+    //   if (error) throw new Error(error);
+    //
+    //   console.log(body);
+    // });
   }
 }
