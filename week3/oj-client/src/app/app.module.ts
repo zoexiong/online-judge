@@ -8,6 +8,7 @@ import { ProblemListComponent } from './components/problem-list/problem-list.com
 
 import { DataService } from "./services/data.service";
 import { AuthService } from "./services/auth.service";
+import { AuthGuardService } from "./services/auth-guard.service";
 import {Data} from "@angular/router";
 import { ProblemDetailComponent } from './components/problem-detail/problem-detail.component';
 //RouterModule
@@ -38,7 +39,12 @@ import { ProfileComponent } from './components/profile/profile.component';
   },{
     provide:"auth",
     useClass: AuthService
-  }],
+  }, AuthGuardService
+  //   {
+  //   provide:"authGuard",
+  //   useClass: AuthGuardService
+  // }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
