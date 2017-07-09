@@ -14,6 +14,14 @@ export class EditorComponent implements OnInit {
   //editor is inside the editor component wrapper and need to be private inside the component
   editor: any;
 
+  public languages: string[] = ['Java', 'C++', 'Python'];
+  language: string = 'Java'; //default
+  languageToMode: Object = {
+    'java': 'java',
+    'python': 'python',
+    'c++': 'c_cpp'
+  };
+
   defaultContent = {
     'Java': `public class Example {
       public static void main(String[] args) {
@@ -37,13 +45,28 @@ export class EditorComponent implements OnInit {
   }
 
   ngOnInit() {
-    
+
     this.editor = ace.edit('editor');
     this.editor.setTheme('ace/theme/eclipse');
-    this.editor.getSession().setMode("ace/mode/java");
-    this.editor.setValue(this.defaultContent['Java']);
+    this.resetEditor();
 
     //for code over one page, set scrolling to infinity
     this.editor.$blockScrolling = Infinity;
   }
+
+  setLanguage(language: string): void{
+    this.language = language;
+    this.resetEditor();
+  }
+
+  resetEditor(): void {
+    this.editor.getSession().setMode('ace/mode/' + this.languageToMode[this.language.toLowerCase()]);
+    this.editor.setValue(this.defaultContent[this.language]);
+  }
+
+  submit(): void{
+    let user_code = this.editor.getValue();
+    console.log(user_code);
+  }
+
 }
