@@ -9,6 +9,7 @@ import { ProblemListComponent } from './components/problem-list/problem-list.com
 import { DataService } from "./services/data.service";
 import { AuthService } from "./services/auth.service";
 import { AuthGuardService } from "./services/auth-guard.service";
+import { CollaborationService } from "./services/collaboration.service";
 import {Data} from "@angular/router";
 import { ProblemDetailComponent } from './components/problem-detail/problem-detail.component';
 //RouterModule
@@ -35,16 +36,22 @@ import { EditorComponent } from './components/editor/editor.component';
     HttpModule,
     routing
   ],
-  providers: [{
-    provide:"data",
-    useClass: DataService
-  },{
-    provide:"auth",
-    useClass: AuthService
+  providers: [
+    {
+      provide:"data",
+      useClass: DataService
   },
     {
-    provide:"authGuard",
-    useClass: AuthGuardService
+      provide:"collaboration",
+      useClass: CollaborationService
+  },
+    {
+      provide:"auth",
+      useClass: AuthService
+  },
+    {
+      provide:"authGuard",
+      useClass: AuthGuardService
   }, AuthGuardService
   ],
   bootstrap: [AppComponent]

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 
 //need to declare as a global variable to use ace-builds
 declare var ace: any;
@@ -40,7 +40,7 @@ export class EditorComponent implements OnInit {
             # Write your Python code here`
   };
 
-  constructor() {
+  constructor(@Inject('collaboration') private collaboration) {
 
   }
 
@@ -49,9 +49,9 @@ export class EditorComponent implements OnInit {
     this.editor = ace.edit('editor');
     this.editor.setTheme('ace/theme/eclipse');
     this.resetEditor();
-
     //for code over one page, set scrolling to infinity
     this.editor.$blockScrolling = Infinity;
+    this.collaboration.init();
   }
 
   setLanguage(language: string): void{
