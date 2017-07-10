@@ -1,4 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 
 //need to declare as a global variable to use ace-builds
 declare var ace: any;
@@ -14,8 +15,12 @@ export class EditorComponent implements OnInit {
   //editor is inside the editor component wrapper and need to be private inside the component
   editor: any;
 
+  sessionId: string;
+
   public languages: string[] = ['Java', 'C++', 'Python'];
+
   language: string = 'Java'; //default
+
   languageToMode: Object = {
     'java': 'java',
     'python': 'python',
@@ -40,19 +45,41 @@ export class EditorComponent implements OnInit {
             # Write your Python code here`
   };
 
-  constructor(@Inject('collaboration') private collaboration) {
-
+  constructor(@Inject('collaboration') private collaboration,
+    private route: ActivatedRoute) {
   }
 
-  ngOnInit() {
 
+  ngOnInit() {
+    //get url to send to server
+    this.route.params
+      .subscribe(params => {
+        this.sessionId = params['id'];
+        this.initEditor();
+      });
+  }
+
+  initEditor(): void {
     this.editor = ace.edit('editor');
     this.editor.setTheme('ace/theme/eclipse');
     this.resetEditor();
     //for code over one page, set scrolling to infinity
     this.editor.$blockScrolling = Infinity;
-    this.collaboration.init();
-  }
+    //set focus to editor when open webpage
+    document.getElementsByTagName('textarea')[0].focus();
+
+    this.collaboration.init(this.editor, this.sessionId);
+    this.editor.lastAppliedChange = null;
+
+    //get change event
+    this.editor.on('change', (e) => {
+      console.log('editor changes: ' + JSON.stringify(e));
+      //only send changes when change is not equal to lastAppliedChange to avoid sending duplicate changes, or send change to oneself
+      if (this.editor.lastAppliedChange != e) {
+        this.collaboration.change(JSON.stringify(e));
+      }
+    });
+  };
 
   setLanguage(language: string): void{
     this.language = language;
