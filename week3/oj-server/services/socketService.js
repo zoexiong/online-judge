@@ -58,6 +58,14 @@ module.exports = function(io) {
         // socket event listeners
         socket.on('change', delta => {
             console.log( "change " + socketIdToSessionId[socket.id] + " " + delta ) ;
+
+            let sessionId = socketIdToSessionId[socket.id];
+
+            if (sessionId in collaborations) {
+                //event array: key is "change" and value is event, and add date for debug purpose
+                collaborations[sessionId]['cachedChangeEvents'].push(["change", delta, Date.now()]);
+            }
+
             forwardEvents(socket.id, 'change', delta);
         });
 
@@ -67,6 +75,17 @@ module.exports = function(io) {
             cursor = JSON.parse(cursor);
             cursor['socketId'] = socket.id;
             forwardEvents(socket.id, 'cursorMove', JSON.stringify(cursor));
+        });
+
+        socket.on('restoreBuffer', () => {
+            let sessionId = socketIdToSessionId[socket.id];
+            console.log('restoring buffer for session: ' + sessionId + ', socket: ' + socket.id);
+            if (sessionId in collaborations) {
+                let changeEvents = collaborations[sessionId]['cachedChangeEvents'];
+                for (let i = 0; i < changeEvents.length; i++) {
+                    socket.emit(changeEvents[i][0], changeEvents[i][1]);
+                }
+            }
         });
 
         socket.on('disconnect', function() {
