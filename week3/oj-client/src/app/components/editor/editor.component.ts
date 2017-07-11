@@ -71,7 +71,7 @@ export class EditorComponent implements OnInit {
     this.collaboration.init(this.editor, this.sessionId);
     this.editor.lastAppliedChange = null;
 
-    //get change event
+    //add listener for changes
     this.editor.on('change', (e) => {
       console.log('editor changes: ' + JSON.stringify(e));
       //only send changes when change is not equal to lastAppliedChange to avoid sending duplicate changes, or send change to oneself
@@ -85,7 +85,10 @@ export class EditorComponent implements OnInit {
       let cursor = this.editor.getSession().getSelection().getCursor();
       console.log('cursor move: ' + JSON.stringify(cursor));
       this.collaboration.cursorMove(JSON.stringify(cursor));
-    })
+    });
+
+    //after setup, restore changes from server
+    this.collaboration.restoreBuffer();
   };
 
   setLanguage(language: string): void{

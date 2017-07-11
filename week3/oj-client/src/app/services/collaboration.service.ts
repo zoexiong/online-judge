@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-//import colors to avoid random ugly colors
+//import colors to avoid random ugly colors; color is not bind to any particular user
 import { COLORS } from '../../assets/colors';
 
 declare var io: any;
@@ -9,7 +9,7 @@ declare var ace: any;
 export class CollaborationService {
 
   collaborationSocket: any;
-  //store cursor position, color and socketId, etc
+  //store cursor position and socketId, etc
   clientsInfo: Object = {};
   clientNum: number = 0;
 
@@ -76,5 +76,10 @@ export class CollaborationService {
 
   cursorMove(cursor: string): void {
     this.collaborationSocket.emit("cursorMove", cursor);
+  }
+
+  //restore changes from a list so we can apply it for new users
+  restoreBuffer(): void {
+    this.collaborationSocket.emit("restoreBuffer");
   }
 }
