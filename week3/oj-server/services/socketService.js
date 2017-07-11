@@ -56,7 +56,20 @@ module.exports = function(io) {
         // socket event listeners
         socket.on('change', delta => {
             console.log( "change " + socketIdToSessionId[socket.id] + " " + delta ) ;
-            let sessionId = socketIdToSessionId[socket.id];
+            forwardEvents(socket.id, 'change', delta);
+        });
+
+        //handle cursor move events
+        socket.on('cursorMove', cursor => {
+            console.log( "cursorMove " + socketIdToSessionId[socket.id] + " " + cursor ) ;
+            cursor = JSON.parse(cursor);
+            cursor['socketId'] = socket.id;
+            forwardEvents(socket.id, 'cursorMove', JSON.stringify(cursor));
+        });
+
+        function forwardEvents(socketId, eventName, dataString) {
+            let sessionId = socketIdToSessionId[socketId];
+
             //if sessionId already exists in collaborations, broadcast change
             if (sessionId in collaborations) {
                 let participants = collaborations[sessionId]['participants'];
@@ -64,15 +77,13 @@ module.exports = function(io) {
                     //exclude oneself from receiver list
                     if(socket.id != participants[i]){
                         //send change to everyone
-                        io.to(participants[i]).emit("change", delta);
+                        io.to(participants[i]).emit(eventName, dataString);
                     }
                 }
-                collaborations[sessionId]['cachedChangeEvents'].push(["change", delta, Date.now()]);
+                collaborations[sessionId]['cachedChangeEvents'].push([eventName, dataString, Date.now()]);
             } else {
                 console.log("WARNING: could not tie socket_id to any collaboration");
             }
-
-            //forwardEvents(socket.id, 'change', delta);
-        });
+        }
     });
 };
