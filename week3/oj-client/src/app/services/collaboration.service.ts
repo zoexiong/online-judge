@@ -28,6 +28,14 @@ export class CollaborationService {
       editor.getSession().getDocument().applyDeltas([delta]);
     });
 
+    //listening for remove marker when someone disconnected
+    this.collaborationSocket.on('removeMarker', (changeClientId) => {
+      console.log('delete request received');
+      let session = editor.getSession();
+      session.removeMarker(this.clientsInfo[changeClientId]['marker']);
+      console.log('delete request complete');
+    });
+
     //listening on cursor moves send from server
     this.collaborationSocket.on("cursorMove", (cursor) => {
       console.log("cursor move: " + cursor);
@@ -62,10 +70,7 @@ export class CollaborationService {
       console.log('new marker: ',newMarker);
     });
 
-    //Test: what to do when receive message
-    // this.collaborationSocket.on("message", (message) => {
-    //   console.log("received: " + message);
-    // })
+
   }
 
   //listening on changes from client

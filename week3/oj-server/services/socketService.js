@@ -97,6 +97,11 @@ module.exports = function(io) {
                 let index = participants.indexOf(socket.id);
                 //if server crashed or someone counterfeited a session, it might cause problem since index might = 0
                 if (index >= 0) {
+
+                    //delete marker for this user
+                    forwardEvents(socket.id, 'removeMarker', socket.id);
+                    console.log('delete marker emitted');
+
                     //delete this participant
                     participants.splice(index, 1);
                     if (participants.length == 0) {
