@@ -37,35 +37,13 @@ export class AuthService {
       if (authResult && authResult.accessToken && authResult.idToken) {
         window.location.hash = '';
 
-        let promiseAuth = new Promise(resolve => {
-          this.setSession(authResult, () => {
-            resolve();
-          })
-        });
-
-        let promiseProfile = new Promise(resolve => {
-          if (localStorage['access_token']) {
-            this.auth0.client.userInfo(localStorage['access_token'], (err, profile) => {
-              if (profile) {
-                resolve(profile);
-              }
-            });
-          }
-        });
-
-        promiseAuth
-          .then(() => {
-            promiseProfile.then((profile) => {
-              localStorage.setItem('profile', JSON.stringify(profile));
-              //access local storage to get the path and redirect to original page
-              if (localStorage['redirectUri']){
-                this.router.navigate([localStorage['redirectUri']]);
-                window.location.reload(false);
-                localStorage.setItem('redirectUri', '');
-              }
-            })
-        })
-
+        this.setSession(authResult);
+        //access local storage to get the path and redirect to original page
+        if (localStorage['redirectUri']) {
+          this.router.navigate([localStorage['redirectUri']]);
+          window.location.reload(false);
+          localStorage.setItem('redirectUri', '');
+        }
       } else if (err) {
         this.router.navigate(['/']);
         console.log(err);
@@ -76,13 +54,12 @@ export class AuthService {
     });
   }
 
-  private setSession(authResult, cb): void {
+  private setSession(authResult): void {
     // Set the time that the access token will expire at
     const expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
-    cb();
   }
 
   public logout(): void {
@@ -107,38 +84,19 @@ export class AuthService {
     return new Date().getTime() < expiresAt;
   }
 
-  //get user profile
-  userProfile: any;
-
-  public getUserinfo(cb): void {
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
-      throw new Error('Access token must exist to fetch profile');
-    }
-    const self = this;
-    this.auth0.client.userInfo(accessToken, (err, profile) => {
-      if (profile) {
-        self.userProfile = profile;
-        localStorage.setItem('profile', JSON.stringify(profile));
-      }
-      cb(err, profile);
-    });
-  }
-
   public getProfile(cb): void {
-    var profileJSON = {};
+    const accessToken = localStorage.getItem('access_token');
     if (localStorage['profile']) {
-      profileJSON = JSON.parse(localStorage['profile']);
-      cb(profileJSON);
-    } else if (localStorage['access_token']) {
-      this.getUserinfo((err, profile) => {
-        if (profile){
-          profileJSON = JSON.parse(localStorage['profile']);
-        } else {
-          console.log('error when getting profile');
+      cb(JSON.parse(localStorage['profile']));
+    } else if (accessToken) {
+      this.auth0.client.userInfo(accessToken, (err, profile) => {
+        if (profile) {
+          cb(profile);
+          localStorage.setItem('profile', JSON.stringify(profile));
         }
-        cb(profileJSON);
-      })
+      });
+    } else {
+        console.log('Access token must exist to fetch profile');
     }
   }
 
