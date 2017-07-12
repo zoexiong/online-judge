@@ -3,17 +3,18 @@ import { Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
 import * as auth0 from 'auth0-js/build/auth0.js';
 import { Http, Response, Headers } from "@angular/http";
+import { NavbarComponent } from '../components/navbar/navbar.component';
 
 @Injectable()
 export class AuthService {
 
   auth0 = new auth0.WebAuth({
     clientID: '77qZhSotzYJwgx1U3NYeEE9YGGD71Qd6',
-    domain: 'justkzoe.auth0.com',
-    responseType: 'token id_token',
-    audience: 'https://justkzoe.auth0.com/userinfo',
-    redirectUri: 'http://localhost:3000',
-    scope: 'openid profile email'
+      domain: 'justkzoe.auth0.com',
+      responseType: 'token id_token',
+      audience: 'https://justkzoe.auth0.com/userinfo',
+      redirectUri: 'http://localhost:3000',
+      scope: 'openid profile email'
   });
 
   domain = 'justkzoe.auth0.com';
@@ -35,13 +36,36 @@ export class AuthService {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         window.location.hash = '';
-        this.setSession(authResult);
-        //access local storage to get the path and redirect to original page
-        if (localStorage['redirectUri']) {
-          this.router.navigate([localStorage['redirectUri']]);
-          localStorage.setItem('redirectUri', '');
-          window.location.reload(false);
-        }
+
+        let promiseAuth = new Promise(resolve => {
+          this.setSession(authResult, () => {
+            resolve();
+          })
+        });
+
+        let promiseProfile = new Promise(resolve => {
+          if (localStorage['access_token']) {
+            this.auth0.client.userInfo(localStorage['access_token'], (err, profile) => {
+              if (profile) {
+                resolve(profile);
+              }
+            });
+          }
+        });
+
+        promiseAuth
+          .then(() => {
+            promiseProfile.then((profile) => {
+              localStorage.setItem('profile', JSON.stringify(profile));
+              //access local storage to get the path and redirect to original page
+              if (localStorage['redirectUri']){
+                this.router.navigate([localStorage['redirectUri']]);
+                window.location.reload(false);
+                localStorage.setItem('redirectUri', '');
+              }
+            })
+        })
+
       } else if (err) {
         this.router.navigate(['/']);
         console.log(err);
@@ -52,12 +76,13 @@ export class AuthService {
     });
   }
 
-  private setSession(authResult): void {
+  private setSession(authResult, cb): void {
     // Set the time that the access token will expire at
     const expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
+    cb();
   }
 
   public logout(): void {
@@ -94,20 +119,25 @@ export class AuthService {
     this.auth0.client.userInfo(accessToken, (err, profile) => {
       if (profile) {
         self.userProfile = profile;
-        localStorage.setItem('profile', JSON.stringify(profile))
+        localStorage.setItem('profile', JSON.stringify(profile));
       }
       cb(err, profile);
     });
   }
 
   public getProfile(cb): void {
-    var profile = {};
+    var profileJSON = {};
     if (localStorage['profile']) {
-      profile = JSON.parse(localStorage['profile']);
-      cb(profile);
+      profileJSON = JSON.parse(localStorage['profile']);
+      cb(profileJSON);
     } else if (localStorage['access_token']) {
       this.getUserinfo((err, profile) => {
-        cb(profile);
+        if (profile){
+          profileJSON = JSON.parse(localStorage['profile']);
+        } else {
+          console.log('error when getting profile');
+        }
+        cb(profileJSON);
       })
     }
   }
