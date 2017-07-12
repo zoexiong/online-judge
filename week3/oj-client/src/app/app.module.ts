@@ -52,7 +52,7 @@ import { EditorComponent } from './components/editor/editor.component';
     {
       provide:"authGuard",
       useClass: AuthGuardService
-  }, AuthGuardService
+  }
   ],
   bootstrap: [AppComponent]
 })

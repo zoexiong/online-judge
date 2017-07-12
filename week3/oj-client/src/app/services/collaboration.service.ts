@@ -30,10 +30,12 @@ export class CollaborationService {
 
     //listening for remove marker when someone disconnected
     this.collaborationSocket.on('removeMarker', (changeClientId) => {
-      console.log('delete request received');
       let session = editor.getSession();
-      session.removeMarker(this.clientsInfo[changeClientId]['marker']);
-      console.log('delete request complete');
+      if (this.clientsInfo[changeClientId]) {
+        console.log('delete request received');
+        session.removeMarker(this.clientsInfo[changeClientId]['marker']);
+        console.log('delete request complete');
+      }
     });
 
     //listening on cursor moves send from server

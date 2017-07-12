@@ -21,15 +21,11 @@ export class AuthGuardService implements CanActivate{
       if (profile['http://localhost:3000/roles']){
         var roles = profile['http://localhost:3000/roles'];
         if(this.auth.isAuthenticated() && roles.includes('admin')){
-          console.log('1');
           return true;
         } else {
-          console.log('2');
           return false;
         }
       }
-    } else{
-      console.log('3');
     }
   }
 }
