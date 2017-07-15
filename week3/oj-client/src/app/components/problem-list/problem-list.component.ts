@@ -12,6 +12,11 @@ export class ProblemListComponent implements OnInit {
 
   problems: Problem[] = [];
   subscriptionProblems: Subscription;
+  birthday =  "1997-07-01";
+  birthday2 = new Date();
+  money = 2001;
+  Apr = 0.18;
+
 
   //data become private variable
   constructor(@Inject("data") private data) { }

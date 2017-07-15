@@ -62,14 +62,14 @@ export class AppComponent {
 
     //-------------------------------------------------------------------------
     // map could be used to manipulate numbers and strings, etc and return as a new observable
-    const source$ = Observable.from(['Adam', 'Bill', 'Cow'])
-      .map(v => v.toUpperCase())
-      .map(v => 'I am ' + v);
-    source$.subscribe(
-      v => console.log(v),
-      err => console.error(err),
-      () => console.log('completed')
-    );
+    // const source$ = Observable.from(['Adam', 'Bill', 'Cow'])
+    //   .map(v => v.toUpperCase())
+    //   .map(v => 'I am ' + v);
+    // source$.subscribe(
+    //   v => console.log(v),
+    //   err => console.error(err),
+    //   () => console.log('completed')
+    // );
 
     // 00:43:06.103 app.component.ts:69 I am ADAM
     // 00:43:06.112 app.component.ts:69 I am BILL
@@ -77,14 +77,13 @@ export class AppComponent {
     // 00:43:06.114 app.component.ts:71 completed
 
 
-
-
-
-
-
-
-
     //////############# Create Observable from Http Request ##############////////
+
+    // getUser(username) {
+    //   //return as a observable
+    //   return this.http.get('https://api.github.com/users/' + username);
+    // }
+
     // this.getUser('zoexiong')
     //   .subscribe(
     //     res => console.log(res.json())
