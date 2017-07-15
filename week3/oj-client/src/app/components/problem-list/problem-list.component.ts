@@ -12,17 +12,15 @@ export class ProblemListComponent implements OnInit {
 
   problems: Problem[] = [];
   subscriptionProblems: Subscription;
-  birthday =  "1997-07-01";
-  birthday2 = new Date();
-  money = 2001;
-  Apr = 0.18;
-
+  searchTerm: string = '';
+  subscriptionInput: Subscription;
 
   //data become private variable
-  constructor(@Inject("data") private data) { }
+  constructor(@Inject("data") private data, @Inject('input') private input) { }
 
   ngOnInit() {
     this.getProblems();
+    this.getSearchTerm();
   }
 
   //use observable
@@ -30,4 +28,12 @@ export class ProblemListComponent implements OnInit {
     this.subscriptionProblems = this.data.getProblems()
       .subscribe(problems => this.problems = problems);
   }
+
+  getSearchTerm(): void{
+    this.subscriptionInput = this.input.getInput()
+      .subscribe(
+        inputTerm => this.searchTerm = inputTerm
+      );
+  }
+
 }

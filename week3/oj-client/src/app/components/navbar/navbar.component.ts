@@ -1,6 +1,9 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 //import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs/Subscription';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +18,11 @@ export class NavbarComponent implements OnInit {
 
   profile: any;
 
-  constructor(public auth: AuthService) {
+  searchBox: FormControl = new FormControl();
+
+  subscription: Subscription;
+
+  constructor(public auth: AuthService, @Inject('input') private input, private router: Router) {
     auth.handleAuthentication();
   }
 
@@ -23,5 +30,25 @@ export class NavbarComponent implements OnInit {
     this.auth.getProfile((profile) => {
       this.profile = profile;
     });
+
+    this.subscription = this.searchBox
+      //this property is a observable
+      .valueChanges
+      .subscribe(
+        term => {
+          this.input.changeInput(term);
+        }
+      );
   }
+
+
+  searchProblem() :void{
+    this.router.navigate(['/problems'])
+  }
+
+  //in case cause memory leak
+  ngOnDestroy() :void{
+    this.subscription.unsubscribe();
+  }
+
 }
