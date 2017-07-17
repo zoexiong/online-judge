@@ -53,7 +53,6 @@ export class DataService {
     return this.http.post('/api/v1/build_and_run', data, headers)
       .toPromise()
       .then((res: Response) => {
-        console.log(res);
         return res.json();
       })
       .catch(this.handleError);
