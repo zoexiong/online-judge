@@ -14,8 +14,8 @@ def hello():
 def build_and_run():
     #type of request.data is string, we need to load it as JSON
     data = json.loads(request.data)
-    print('request',request)
-    print('data',data)
+    # print('request',request)
+    # print('data',data)
 
     if 'code' not in data or 'lang' not in data:
         return "Both 'code' and 'lang' should be provided"
@@ -32,3 +32,4 @@ def build_and_run():
 if __name__ == "__main__":
     eu.load_image()
     app.run(debug=True)
+    # use app.run(debug=True, threaded=True) to avoid

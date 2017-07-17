@@ -67,7 +67,8 @@ def build_and_run(code, lang):
     # add source code to local sys (w means write)
     with open('%s/%s' % (source_file_host_dir, SOURCE_FILE_NAMES[lang]), 'w') as source_file:
         source_file.write(code)
-
+        print('!!!!!!' + code)
+        
     try:
         client.containers.run(
             # no space around = when passing parameters as a convention
