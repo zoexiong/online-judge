@@ -50,9 +50,11 @@ export class DataService {
 
   buildAndRun(data): Promise<Object> {
     let headers = new Headers({'content-type': 'application/json'});
+    //return promise
     return this.http.post('/api/v1/build_and_run', data, headers)
       .toPromise()
       .then((res: Response) => {
+        //return object
         return res.json();
       })
       .catch(this.handleError);
