@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 import json
+import executor_utils as eu
 
 app = Flask(__name__)
 
@@ -23,7 +24,11 @@ def build_and_run():
 
     print("API got called with code: %s in %s" % (code, lang))
 
-    return jsonify({"hello": "world!"})
+    result = eu.build_and_run(code, lang)
+
+    # result is a dict, need to output as JSON to avoid error "dict is not callable"
+    return jsonify(result)
 
 if __name__ == "__main__":
+    eu.load_image()
     app.run(debug=True)
