@@ -55,6 +55,7 @@ def make_dir(dir):
         print("Temp build directory [%s] exists." % dir)
 
 def build_and_run(code, lang):
+
     # File sys operations
     result = { 'build': None, 'run': None, 'error': None }
     # generate unique id for folders of different users and services
