@@ -24,6 +24,7 @@ BUILD_COMMANDS = {
     "python" : "python"
 }
 
+# actually python files will be executed for twice since the build and execute commands are the same
 EXECUTE_COMMANDS = {
     "java" : "java",
     "python" : "python"
