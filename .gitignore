@@ -3,6 +3,7 @@
 # compiled output
 /dist
 /tmp
+tmp/
 /out-tsc
 public/
 
@@ -43,6 +44,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.pyc
+*.pyc
 .xml
 
