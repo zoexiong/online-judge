@@ -19,9 +19,11 @@ export class EditorComponent implements OnInit {
 
   output: string = 'test';
 
-  public languages: string[] = ['Java', 'C++', 'Python'];
+  //public languages: string[] = ['Java', 'C++', 'Python'];
 
-  language: string = 'Java'; //default
+  public languages: string[] = ['Python'];
+
+  language: string = 'Python'; //default
 
   languageToMode: Object = {
     'java': 'java',
