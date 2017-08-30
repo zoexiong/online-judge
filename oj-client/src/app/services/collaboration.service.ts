@@ -20,7 +20,7 @@ export class CollaborationService {
 
     //listening on changes send from server
     this.collaborationSocket.on("change", (delta: string) => {
-      console.log('collaboration: editor changes by ' + delta);
+      console.log('received change: editor changes by ' + delta);
       delta = JSON.parse(delta);
       //apply changes to editor
       editor.lastAppliedChange = delta;
@@ -40,7 +40,7 @@ export class CollaborationService {
 
     //listening on cursor moves send from server
     this.collaborationSocket.on("cursorMove", (cursor) => {
-      console.log("cursor move: " + cursor);
+      //console.log("cursor move: " + cursor);
       let session = editor.getSession();
       cursor = JSON.parse(cursor);
       let x = cursor['row'];

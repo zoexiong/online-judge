@@ -57,21 +57,19 @@ module.exports = function(io) {
 
         // socket event listeners
         socket.on('change', delta => {
-            console.log( "change " + socketIdToSessionId[socket.id] + " " + delta ) ;
+            console.log( "change received, session: " + socketIdToSessionId[socket.id] + " " + delta ) ;
 
             let sessionId = socketIdToSessionId[socket.id];
 
             if (sessionId in collaborations) {
                 //event array: key is "change" and value is event, and add date for debug purpose
-                collaborations[sessionId]['cachedChangeEvents'].push(["change", delta, Date.now()]);
+                forwardEvents(socket.id, 'change', delta);
             }
-
-            forwardEvents(socket.id, 'change', delta);
         });
 
         //handle cursor move events
         socket.on('cursorMove', cursor => {
-            console.log( "cursorMove " + socketIdToSessionId[socket.id] + " " + cursor ) ;
+            console.log( "cursorMove received, session: " + socketIdToSessionId[socket.id] + " " + cursor ) ;
             cursor = JSON.parse(cursor);
             cursor['socketId'] = socket.id;
             forwardEvents(socket.id, 'cursorMove', JSON.stringify(cursor));
@@ -79,25 +77,25 @@ module.exports = function(io) {
 
         socket.on('restoreBuffer', () => {
             let sessionId = socketIdToSessionId[socket.id];
-            console.log('restoring buffer for session: ' + sessionId + ', socket: ' + socket.id);
             if (sessionId in collaborations) {
+                console.log('restore buffer request received for session: ' + sessionId + ', socket: ' + socket.id);
                 let changeEvents = collaborations[sessionId]['cachedChangeEvents'];
-                for (let i = 0; i < changeEvents.length; i++) {
+                for (var i = 0; i < changeEvents.length; i++) {
                     socket.emit(changeEvents[i][0], changeEvents[i][1]);
+                    console.log('one buffer sent: ' + 'type ' + changeEvents[i][0] + 'detail' + changeEvents[i][1]);
                 }
             }
         });
 
         socket.on('disconnect', function() {
             let sessionId = socketIdToSessionId[socket.id];
-            console.log('socket ' + socket.id + 'disconnected.');
+            console.log('socket ' + socket.id + 'requested to disconnect.');
 
             if (sessionId in collaborations) {
                 let participants = collaborations[sessionId]['participants'];
                 let index = participants.indexOf(socket.id);
                 //if server crashed or someone counterfeited a session, it might cause problem since index might = 0
                 if (index >= 0) {
-
                     //delete marker for this user
                     forwardEvents(socket.id, 'removeMarker', socket.id);
                     console.log('delete marker emitted');
@@ -122,7 +120,7 @@ module.exports = function(io) {
             //if sessionId already exists in collaborations, broadcast change
             if (sessionId in collaborations) {
                 let participants = collaborations[sessionId]['participants'];
-                for (let i =0; i < participants.length; i++) {
+                for (var i =0; i < participants.length; i++) {
                     //exclude oneself from receiver list
                     if(socket.id != participants[i]){
                         //send change to everyone

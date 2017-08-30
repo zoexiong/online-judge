@@ -16,7 +16,7 @@ export class InputService {
   }
 
   getInput() : Observable<string>{
-    //return a observable instead of a refference of the subject
+    //return a observable instead of a reference of the subject
     return this.inputSubject$.asObservable();
   }
 

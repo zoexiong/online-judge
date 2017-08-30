@@ -77,7 +77,7 @@ export class EditorComponent implements OnInit {
 
     //add listener for changes
     this.editor.on('change', (e) => {
-      console.log('editor changes: ' + JSON.stringify(e));
+      console.log('editor changed: ' + JSON.stringify(e));
       //only send changes when change is not equal to lastAppliedChange to avoid sending duplicate changes, or send change to oneself
       if (this.editor.lastAppliedChange != e) {
         this.collaboration.change(JSON.stringify(e));
@@ -87,7 +87,7 @@ export class EditorComponent implements OnInit {
     //add listener for cursor movement
     this.editor.getSession().getSelection().on("changeCursor", () => {
       let cursor = this.editor.getSession().getSelection().getCursor();
-      console.log('cursor move: ' + JSON.stringify(cursor));
+      console.log('cursor moved: ' + JSON.stringify(cursor));
       this.collaboration.cursorMove(JSON.stringify(cursor));
     });
 
