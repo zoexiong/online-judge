@@ -4,9 +4,9 @@ fuser -k 5000/tcp
 # fuser -k 6379/tcp
 
 # sudo service redis_6379 start
-# cd ../redis-4.0.1/
-# src/redis-server
-# cd ../online-judge
+cd ../redis-4.0.1/
+src/redis-server
+cd ../online-judge
 cd ./oj-server
 sudo npm install
 nodemon server.js &
