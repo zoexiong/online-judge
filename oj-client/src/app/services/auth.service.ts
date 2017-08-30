@@ -7,13 +7,12 @@ import { NavbarComponent } from '../components/navbar/navbar.component';
 
 @Injectable()
 export class AuthService {
-
   auth0 = new auth0.WebAuth({
     clientID: '77qZhSotzYJwgx1U3NYeEE9YGGD71Qd6',
     domain: 'justkzoe.auth0.com',
     responseType: 'token id_token',
     audience: 'https://justkzoe.auth0.com/userinfo',
-    redirectUri: 'http://localhost:3000',
+    redirectUri: 'http://35.164.242.163:3000/',
     scope: 'openid profile email'
   });
 
